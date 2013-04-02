@@ -191,7 +191,7 @@ Ext.ux.FixedMultiSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
 
 	// private single point for selectNode
 	selectNode: function(node, push) {
-		if (!this.isSelected(node)) {
+		if (!n.disabled && !this.isSelected(node)) {
 			this.selNodes.push(node);
 			this.selMap[node.id] = node;
 			node.ui.onSelectedChange(true);
@@ -285,12 +285,14 @@ Ext.ux.FixedMultiSelectionModel = Ext.extend(Ext.tree.MultiSelectionModel, {
 		this.fireEvent("selectionchange", this, this.selNodes, this.lastSelNode);
 		return node;
 	},
+	
 	// returns selected nodes precluding children of other selected nodes...
 	// used for multi drag and drop...
 	getUniqueSelectedNodes: function() {
 		var ret = [];
 		for (var c=0;c<this.selNodes.length;c++) {
 			var parent = this.selNodes[c];
+			if (!parent.draggable && !parent.disabled) continue; // skip non-draggable nodes...
 			ret.push(parent);
 			// nodes are sorted(?) so skip over subsequent nodes inside this one..
 			while ((c+1)<this.selNodes.length && parent.contains(this.selNodes[c+1])) c++;
