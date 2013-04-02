@@ -68,6 +68,10 @@ single clicking a node will trigger the tree editor mode on the first click, rat
 later subsequent click.
 * Selection of nodes doesn't work without at least enableDrag set to true. This is 
 because I put the selection listener into the drag zone.
+* Non-draggable or disabled nodes break single click deselect code, so drag filters these
+nodes to allow dragging even if they are selected. However it still breaks if you have 
+lots of non-draggable nodes selected. Avoid allowing non-draggable or disabled nodes to be
+selected.
 * Requires ExtJS 3.x [Component.mon()]
 
 ExtJS 4.x
