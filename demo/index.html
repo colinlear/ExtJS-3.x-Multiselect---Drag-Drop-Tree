@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Multi-Select (with Drag and Drop) Tree Demo Page</title>
+	<link rel="stylesheet" href="http://cdn.sencha.com/ext-3.4.0/resources/css/ext-all.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="../MultiSelectTree.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="column-tree.css" type="text/css" media="screen" />
+	<style type="text/css">
+
+		.example {
+			height: 500px;
+			width: 400px; 
+			overflow:auto;
+			margin: 20px;
+		}
+		
+		.floatleft {
+			float: left;
+		}
+		
+		#ctesttree {
+			margin: 20px;		
+		}
+
+		H1.explanation {
+			font-size: 16pt;
+		}
+		
+		H3.explanation {
+			font-size: 14pt;
+		}
+		
+		UL.explanation LI {
+			margin-left: 20px;
+			list-style-type: disc;
+		}
+		
+		.explanation {
+			clear: both;
+			margin: 10px;
+			font-family: sans-serif;
+		}
+		
+		code {
+			white-space: pre;
+		}
+		
+	</style>
+	<script type="text/javascript" src="http://cdn.sencha.com/ext-3.4.0/adapter/ext/ext-base.js"></script>
+	<script type="text/javascript" src="http://cdn.sencha.com/ext-3.4.0/ext-all.js"></script>
+	<script type="text/javascript" src="../MultiSelectTree.js"></script>
+	<script type="text/javascript" src="ColumnNodeUI.js"></script>
+	<script type="text/javascript" src="example1.js"></script>
+	<script type="text/javascript" src="example2.js"></script>
+	<script type="text/javascript" src="example3.js"></script>
+	<script type="text/javascript" src="example4.js"></script>
+	<script type="text/javascript" src="example5.js"></script>
+	<script type="text/javascript" src="allowContainerDrop.js"></script>
+</head>
+<body>
+	<h1 class="explanation">Multi Select Tree Demo Page</h1>
+	<p class="explanation">
+		This is a BETA update for my almost finished implementation of a multiselect tree with working drag and drop.
+		As far as I can tell it's nearly feature complete and overwrites all current functionality
+		that relies on selection or dragdata containing only a single node.
+	</p>
+	<p class="explanation">
+		This page uses ExtJS 3.4.0
+		Please post bug reports <a href="http://www.extjs.com/forum/showthread.php?t=75055">here</a>.
+	</p>
+	<p class="explanation">
+		The source is available <a href="../MultiSelectTree.js">here</a>.
+	</p>
+	<h3 class="explanation">Table of Contents</h3>
+	<ul class="explanation">
+		<li><a href="#Usage">Usage</a></li>
+		<li><a href="#Notes">Notes</a></li>
+		<li><a href="#Issues">Known Issues</a></li>
+		<li><a href="#Changelog">Changelog</a></li>
+		<li><a href="#Instructions">Instructions for Drag and Drop</a></li>
+		<li>
+			<a href="#Examples">Examples</a>
+			<ul>
+				<li><a href="#Example_1">Simple Example 1</a></li>
+				<li><a href="#Example_2">Simple Example 2: Sorted+appendOnly tree.</a></li>
+				<li><a href="#Example_3">Two Trees Example 1</a></li>
+				<li><a href="#Example_4">Two Trees Example 2: MultiSelect and Original Tree</a></li>
+				<li><a href="#Example_5">Tree Columns Example (fixed)</a></li>
+			</ul>
+		</li>
+		<li><a href="#AllowContainerDrop">allowContainerDrop</a></li>
+	</ul>
+	
+	<a name="Usage"/>
+	<h3 class="explanation">Usage:</h3>
+	<p class="explanation">1. Include the JS/CSS</p>
+		<code>
+&lt;!DOCTYPE html&gt;
+&lt;head&gt;
+	&lt;title&gt;Demo Page&lt;/title&gt;
+	&lt;link rel="stylesheet" href="http://cdn.sencha.com/ext-3.4.0/resources/css/ext-all.css" type="text/css" media="screen" /&gt;
+	&lt;link rel="stylesheet" href="../MultiSelectTree.css" type="text/css" media="screen" /&gt;
+	&lt;script type="text/javascript" src="http://cdn.sencha.com/ext-3.4.0/adapter/ext/ext-base.js"&gt;&lt;/script&gt;
+	&lt;script type="text/javascript" src="http://cdn.sencha.com/ext-3.4.0/ext-all.js"&gt;&lt;/script&gt;
+	&lt;script type="text/javascript" src="../MultiSelectTree.js"&gt;&lt;/script&gt;
+	...
+		</code>
+	<p class="explanation">2. Instantiate like a normal tree</p>
+	<code>
+	var tree = new Ext.ux.MultiSelectTreePanel({
+		autoScroll:true,
+		width:400,
+		height:500,
+		animate:true,
+		containerScroll: true,
+		renderTo: 'target',
+		ddGroup: 'tree1',
+		enableDD: true, /* Required for Drag and Drop as of MultiSelectTree v1.1 */
+		root: new Ext.tree.AsyncTreeNode({
+			text: 'A Book',
+			draggable:false,
+			id:'node0'
+		}),
+		loader: new Ext.tree.TreeLoader({
+			dataUrl:'bookdata.json'
+		})
+	});
+ 	</code> 
+	<a name="Notes"/>
+	<h3 class="explanation">Notes:</h3>
+	<ul class="explanation">
+		<li>Don't set a custom Selection Model as only the default supports multiple drag and drop</li>
+		<li>Don't set a custom TreeDragZone as only the default supports multiple drag and drop</li>
+		<li>Don't set a custom TreeDropZone as only the default supports multiple drag and drop</li>
+		<li>When reacting to DND events use dragdata.nodes (array) instead of dragdata.node</li>
+	</ul>
+	<a name="Issues"/>
+	<h3 class="explanation">Known Issues:</h3>
+	<ul class="explanation">
+		<li>Doesn't work properly with a TreeEditor. Changes to the selection events, mean that
+			single clicking a node will trigger the tree editor mode on the first click, rather
+			a later subsequent click.</li>
+		<li>Selection of nodes doesn't work without at least enableDrag set to true. This is 
+			because I put the selection listener into the drag zone.</li>
+		<li>Requires ExtJS 3.x [Component.mon()]</li>
+	</ul>
+	<a name="Changelog">
+	<h3 class="explanation">Changelog:</h3>
+	<p class="explanation">
+		v1.0 Initial release
+	</p>
+	<p class="explanation"> 
+		v1.1 Improved Version
+	</p>
+	<ul class="explanation">
+		<li>reinstated enableDD, enableDrag, enableDrop config params. *NEEDED FOR DRAG AND DROP*</li>
+		<li>included onContainerOver and onContainerDrop code</li>
+		<li>cleaned up DDGhost generation code to be less hacky (still not ideal)</li>
+		<li>consolidated compareDocumentPosition code into compareNodeOrder (only works with rendered nodes)</li>
+		<li>cleaned up select function by above and creating selectNode function.</li>
+		<li>fixed several lingering postdrag selection bugs</li>
+ 		<li>fixed key events to respect shift/ctrl keys</li>
+	</ul>
+	<p class="explanation"> 
+		v1.2 Current release
+	</p>
+	<ul class="explanation">
+		<li>*Improvement* Single Click on a select range of nodes now deselects other nodes.</li>
+		<li>*FIX* Workaround to avoid (minor) flickering (part of default Ext DD code) when click+hold (for more than 250ms) but not drag.</li>
+		<li>Update Licence to Dual GPL3 or BSD style for commercial licensees.</li>
+	</ul>
+	<a name="Instructions"/>
+	<h3 class="explanation">Instructions for Drag and Drop</h3>
+	<p class="explanation">
+		Ctrl-Click to multi select (or equivalent combination)<br>
+		Shift-Click to range select (tested on Safari 3.1+, Opera 9.5+, Firefox 3, MSIE6+, Chrome)
+	</p>
+	<a name="Examples"/>
+	<h3 class="explanation">Examples:</h3>
+	<a name="Example_1"/>
+	<p class="explanation">
+		A multi-select drag and drop tree instrumented for rearranging a document structure. 
+		Source: <a href="example1.js">example1.js</a>
+	</p>
+	<div id="example1" class="example"></div>
+	<a name="Example_2"/>
+	<p class="explanation">
+		A multi-select drag and drop tree instrumented for rearranging a sorted append-only group 
+		structure. Source: <a href="example2.js">example2.js</a>
+	</p>
+	<div id="example2" class="example"></div>
+	<a name="Example_3"/>
+	<p class="explanation">
+		The Multiple Trees example very much like
+		<a href="http://extjs.com/deploy/dev/examples/tree/two-trees.html">http://extjs.com/deploy/dev/examples/tree/two-trees.html</a>
+		with working Multi Select Drag and Drop. (and allowContainerDrop) Source: <a href="example3.js">example3.js</a>
+	</p>
+	<div id="example3_one" class="example floatleft"></div>
+	<div id="example3_two" class="example floatleft"></div>
+	<p class="explanation">
+		<a name="Example_3"/>
+		Example of mixing a MultiSelect tree and Default Ext Tree together.
+		Source: <a href="example4.js">example4.js</a>
+	</p>
+	<div id="example4_multi" class="example floatleft"></div>
+	<div id="example4_orig" class="example floatleft"></div>
+	<p class="explanation">
+		<a name="Example_5"/>
+		The Column Tree Example from 
+		<a href="http://extjs.com/deploy/dev/examples/tree/column-tree.html">http://extjs.com/deploy/dev/examples/tree/column-tree.html.</a> 
+		modified that extends MultiSelectTreePanel.
+	</p>
+	<p class="explanation">
+		By default ColumnNodeUI doesn't support drag and drop from anything other than the tree node text 
+		or the tree node icon (or empty column cells) this is because the example doesn't override 
+		getDDHandles() in TreeNodeUI to include all the possible drag handles in the row. 
+		See the modified <a href="ColumnNodeUI.js">ColumnNodeUI.js</a> for the working code.
+	</p>
+	<p class="explanation">
+		This is just an example, it's not supposed to make sense where nodes can be dropped and it
+		looks funny for me in IE6.
+		Source: <a href="example5.js">example5.js</a>
+	</p>
+	<div id="example5" class="example" style="width: 550px;"></div>
+	<a name="AllowContainerDrop"/>
+	<h3 class="explanation">AllowContainerDrop</h3>
+	<p class="explanation">
+		AllowContainerDrop now works. This was fixed in ExtJS 3.0
+		This is a working demo, just drag nodes below the bottom of the tree to see how it works.
+		Source code <a href="allowContainerDrop.js">here</a>
+	</p>
+	<div id="allowContainerDrop_demo" class="example"></div>
+	<p class="explanation">
+		MultiSelectTree v1.1 already includes code for appending container drop nodes to the root node.
+	</p>
+</body>
+</html>
+
