@@ -75,6 +75,8 @@ ExtJS 4.x
 
 ExtJS 4.x provides multiple selection, and functional drag and drop. It still has considerable bugs which don't seem to be getting fixed.
 
+See [this project](https://github.com/colinlear/ExtJS-4.x-Tree-Drag-and-Drop-Fix "ExtJS 4.x Tree Fixes: Drag and Drop") for some basic fixes.
+
 
 
 
